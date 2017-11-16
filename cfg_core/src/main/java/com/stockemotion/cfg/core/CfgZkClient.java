@@ -73,6 +73,21 @@ public class CfgZkClient implements Watcher {
         return parentPath;
     }
 
+    public void delete(String znodeKey){
+        String znodePath = this.generateZnodePathFromKey(znodeKey);
+        try {
+            Stat stat = this.zooKeeper.exists(znodePath, true);
+            if (stat != null) {
+                this.zooKeeper.delete(znodePath, stat.getVersion());
+            } else {
+                log.info(">>>>>>>>>> znodeKey[{}] not found.", znodeKey);
+            }
+        } catch (KeeperException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @Override
