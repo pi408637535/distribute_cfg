@@ -7,19 +7,22 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by piguanghua on 2017/11/16.
  */
 @Slf4j
 public class CfgZkClient implements Watcher {
-
     private static String deployenvPath = Environment.deployenv;
     //Todo 没懂
     public static CfgZkClient client = new CfgZkClient();	// 注意静态变量,初始化顺序
@@ -221,4 +224,41 @@ public class CfgZkClient implements Watcher {
         return deployenvPath + "/" + ZnodeKey;
     }
 
+    public static void main(String[] args) throws InterruptedException, KeeperException {
+		/*while (true) {
+			String znodeKey = "key01";
+			String value = "value" + new Random().nextInt(1000);
+			logger.info(">>>>>>>>>> ########## client set, {}:{}", new Object[]{znodeKey, value});
+
+			ZkCfgClient.client.setData(znodeKey, value );
+			//ZkCfgClient.client.delete(znodeKey);
+
+			logger.info(">>>>>>>>>> ########## cache get, {}:{}", znodeKey, ZkCfgLocalCache.get(znodeKey));
+			System.out.println();
+			TimeUnit.SECONDS.sleep(5);
+		}*/
+		/*Map<String, String> addData =client.getAllData();
+		System.out.println("-----------------------");
+		for (Entry<String, String> item : addData.entrySet()) {
+			System.out.println(item.getKey() + ":" + item.getValue());
+		}*/
+
+
+
+        String znodeKey = "key01";
+        String value = "value" + new Random().nextInt(1000);
+        log.info(">>>>>>>>>> ########## client set, {}:{}", new Object[]{znodeKey, value});
+
+        CfgZkClient cfgZkClient = new CfgZkClient();
+
+        cfgZkClient.setData(znodeKey, value );
+        //ZkCfgClient.client.delete(znodeKey);
+
+        log.info(">>>>>>>>>> ########## cache get, {}:{}", znodeKey, LocalCfgCache.get(znodeKey, "123"));
+        System.out.println();
+        TimeUnit.SECONDS.sleep(5);
+
+        Stat stat = cfgZkClient.zooKeeper.exists(deployenvPath, true);
+        cfgZkClient.zooKeeper.delete(deployenvPath, stat.getVersion());
+    }
 }
